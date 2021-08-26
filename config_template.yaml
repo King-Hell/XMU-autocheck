@@ -1,0 +1,10 @@
+enable_email: True
+sender: @qq.com
+receivers: @qq.com
+mail_id: 
+mail_pwd: 
+mail_server: smtp.qq.com
+mail_port: 465
+xmu_id:
+xmu_pwd:
+log_file: auto_check.log
