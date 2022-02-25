@@ -143,7 +143,7 @@ def main():
             logger.info('SUCCESS')
         else:
             logger.warning(f'FAIL, retry: {retry}')
-            RETRY -= 1
+            retry -= 1
             if not debug_flag:
                 time.sleep(sleep_time)
     if not state:
