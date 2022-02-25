@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 
 import yaml
-config = yaml.safe_load(open('config.yaml'))
+config = yaml.safe_load(open('/home/lt/XMU-autocheck/config.yaml'))
 import logging
 logging.basicConfig(filename=config['log_file'],level='INFO',format='[%(asctime)s %(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
@@ -107,7 +107,6 @@ class AutoChecker(object):
         if not state:
             print(ret.json())
             print('打卡失败')
-            self.send_email()
         return state
 
     def send_email(self):
@@ -126,19 +125,31 @@ class AutoChecker(object):
         smtpObj.quit()
 
 def main():
-    if len(sys.argv) == 1:
-        sleep_time = random.random()*600
-        time.sleep(int(sleep_time))
+    debug_flag = len(sys.argv) > 1
+    if not debug_flag:
+        sleep_time = int(random.random()*600)
+        print(f'Wait random time: {sleep_time}s')
+        time.sleep(sleep_time)
     else:
-        # test mode
+        # debug mode
         config['enable_email'] = False
     logger.info('Start auto check')
     auto_checker = AutoChecker(config)
-    state = auto_checker.run()
-    if state:
-        logger.info('SUCCESS')
-    else:
-        logger.warning('FAIL')
+    state = False
+    retry = 3
+    while not state and retry > 0:
+        state = auto_checker.run()
+        if state:
+            logger.info('SUCCESS')
+        else:
+            logger.warning(f'FAIL, retry: {retry}')
+            RETRY -= 1
+            if not debug_flag:
+                time.sleep(sleep_time)
+    if not state:
+        logger.warning('Send mail')
+        auto_checker.send_email()
+
 
 if __name__ == '__main__':
     main()
