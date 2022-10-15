@@ -133,6 +133,8 @@ def main():
     else:
         # debug mode
         config['enable_email'] = False
+        print(f'Wait time: {sleep_time}s')
+        time.sleep(int(sys.argv[1]))
     logger.info('Start auto check')
     auto_checker = AutoChecker(config)
     state = False
